@@ -1,8 +1,12 @@
 package sqlb
 
 import (
+	"bytes"
+	"html"
 	"reflect"
+	"regexp"
 	"strconv"
+	"strings"
 )
 
 func valueInterface(value interface{}) [2]string {
@@ -28,4 +32,23 @@ func valueInterface(value interface{}) [2]string {
 	}
 
 	return result
+}
+
+func removeSpecialChar(char interface{}) string {
+	val := valueInterface(char)[0]
+	val = string(bytes.Trim([]byte(val), "\xef\xbb\xbf"))
+	reg, err := regexp.Compile("[^ -~]+")
+	if err != nil {
+		return ""
+	}
+	str := reg.ReplaceAllString(val, "")
+	str = addSlash(str)
+	str = html.EscapeString(str)
+	return str
+}
+
+func addSlash(char string) string {
+	var str = strings.Replace(char, "'", "\\'", -1)
+	str = strings.Replace(str, "\"", "\\\"", -1)
+	return str
 }

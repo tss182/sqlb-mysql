@@ -39,6 +39,10 @@ type whereDb struct {
 	op       string //'',in,notIn,startGroup,endGroup,between
 }
 
+func (db *Init) RemoveSpecialChar() {
+	db.removeSpecialChar = true
+}
+
 func (db *Init) From(from string) *Init {
 	db.from = from
 	db.call = false
@@ -77,7 +81,7 @@ func (db *Init) Clear() {
 }
 
 func (db *Init) QueryView() string {
-	return strings.Join(db.query, "/n")
+	return strings.Join(db.query, "\n")
 }
 
 func (db *Init) Transaction() error {

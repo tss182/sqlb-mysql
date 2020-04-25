@@ -61,12 +61,12 @@ func (db *Init) WhereBetweenOr(field, startDate, endDate string) *Init {
 }
 
 func (db *Init) StartGroup() *Init {
-	db.where = append(db.where, whereDb{and: true, op: "starGroup"})
+	db.where = append(db.where, whereDb{and: true, op: "startGroup"})
 	return db
 }
 
 func (db *Init) StartGroupOr() *Init {
-	db.where = append(db.where, whereDb{and: false, op: "starGroup"})
+	db.where = append(db.where, whereDb{and: false, op: "startGroup"})
 	return db
 }
 
@@ -97,7 +97,7 @@ func (db *Init) Having(str string) *Init {
 
 func (db *Init) joinBuild() {
 	for _, v := range db.join {
-		db.query = append(db.query, v)
+		db.query = append(db.query, strings.TrimSpace(v))
 	}
 }
 
@@ -115,6 +115,9 @@ func whereInValue(dt []interface{}) []string {
 	return valStr
 }
 func (db *Init) whereBuild() {
+	if len(db.where) >= 1 {
+		db.query = append(db.query, "where")
+	}
 	for i, v := range db.where {
 		query := ""
 		if i != 0 && v.op != "endGroup" {
@@ -140,10 +143,10 @@ func (db *Init) whereBuild() {
 			fieldAr := strings.Split(strings.TrimSpace(v.field), " ")
 			getValue := true
 			if len(fieldAr) == 1 {
-				query += fieldAr[0]
+				query += fieldAr[0] + " = "
 			} else if len(fieldAr) >= 2 {
 				if strings.ToLower(fieldAr[1]) == "sql" {
-					query += v.value.(string)
+					query += addSlash(v.value.(string))
 					getValue = false
 				} else {
 					query += fieldAr[0] + " " + fieldAr[1]
@@ -154,9 +157,9 @@ func (db *Init) whereBuild() {
 			if getValue {
 				value := valueInterface(v.value)
 				if value[1] == "string" {
-					query += " '" + value[0] + "'"
+					query += " '" + addSlash(value[0]) + "'"
 				} else {
-					query += value[0]
+					query += " " + value[0]
 				}
 			}
 		}
@@ -191,14 +194,18 @@ func (db *Init) buildQuery() error {
 	db.whereBuild()
 
 	//add groupBy
-	db.query = append(db.query, db.groupBy)
+	if db.groupBy != "" {
+		db.query = append(db.query, "group by "+db.groupBy)
+	}
 
 	//add having
-	db.query = append(db.query, db.having)
+	if db.having != "" {
+		db.query = append(db.query, "having "+db.having)
+	}
 
 	//add order by
 	for _, v := range db.orderBy {
-		db.query = append(db.query, v)
+		db.query = append(db.query, "order by "+v)
 	}
 
 	//add limit
@@ -292,7 +299,12 @@ func (db *Init) Call(procedure string, value []interface{}) *Init {
 	if len(value) != 0 {
 		var valAr []string
 		for _, v := range value {
-			str := valueInterface(v)[0]
+			var str string
+			if db.removeSpecialChar {
+				str = removeSpecialChar(v)
+			} else {
+				str = valueInterface(v)[0]
+			}
 			valAr = append(valAr, str)
 		}
 		values = "('" + strings.Join(valAr, "','") + "')"
