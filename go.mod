@@ -1,4 +1,4 @@
-module github.com/tss182/sqlb
+module github.com/tss182/sqlb-mysql
 
 go 1.14
 
