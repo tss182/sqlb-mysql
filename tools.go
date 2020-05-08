@@ -52,3 +52,11 @@ func addSlash(char string) string {
 	str = strings.Replace(str, "\"", "\\\"", -1)
 	return str
 }
+
+func joinMapKey(data map[string]interface{}, sep string) string {
+	result := []string{}
+	for i, _ := range data {
+		result = append(result, i)
+	}
+	return strings.Join(result, sep)
+}
