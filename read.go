@@ -230,7 +230,11 @@ func (db *Init) Result() ([]map[string]interface{}, error) {
 	}
 
 	var stmt *Stmt
-	stmt, err = db.dbs.Prepare(sqlQuery)
+	if db.transaction != nil {
+		stmt, err = db.transaction.Prepare(sqlQuery)
+	} else {
+		stmt, err = db.dbs.Prepare(sqlQuery)
+	}
 	if err != nil {
 		return nil, err
 	}
