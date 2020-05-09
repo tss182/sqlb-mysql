@@ -101,9 +101,9 @@ func (db *Init) joinBuild() {
 	}
 }
 
-func whereInValue(dt []interface{}) []string {
+func whereInValue(dt interface{}) []string {
 	var valStr []string
-	for _, v := range dt {
+	for _, v := range dt.([]interface{}) {
 		switch val := v.(type) {
 		case string:
 			valStr = append(valStr, "'"+val+"'")
