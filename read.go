@@ -103,14 +103,15 @@ func (db *Init) joinBuild() {
 
 func whereInValue(dt interface{}) []string {
 	var valStr []string
-	for _, v := range dt.([]interface{}) {
-		switch val := v.(type) {
-		case string:
-			valStr = append(valStr, "'"+val+"'")
-		default:
-			data := valueInterface(val)
-			valStr = append(valStr, data[0])
-		}
+	switch v := dt.(type) {
+	case []string:
+		for _,v2 := range v { valStr = append(valStr,"'"+v2+"'")}
+	case []int:
+		for _,v2 := range v { valStr = append(valStr,strconv.Itoa(v2))}
+	case []uint:
+		for _,v2 := range v { valStr = append(valStr,strconv.Itoa(int(v2)))}
+	default:
+		panic("error, type data where in not support")
 	}
 	return valStr
 }
