@@ -33,7 +33,6 @@ type whereDb struct {
 	and      bool
 	field    string
 	value    interface{}
-	valueIn  []interface{}
 	starDate string
 	endDate  string
 	op       string //'',in,notIn,startGroup,endGroup,between

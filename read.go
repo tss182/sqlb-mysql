@@ -30,23 +30,23 @@ func (db *Init) WhereOr(field string, value interface{}) *Init {
 	return db
 }
 
-func (db *Init) WhereIn(field string, value []interface{}) *Init {
-	db.where = append(db.where, whereDb{and: true, field: field, valueIn: value, op: "in"})
+func (db *Init) WhereIn(field string, value interface{}) *Init {
+	db.where = append(db.where, whereDb{and: true, field: field, value: value, op: "in"})
 	return db
 }
 
-func (db *Init) WhereInOr(field string, value []interface{}) *Init {
-	db.where = append(db.where, whereDb{and: false, field: field, valueIn: value, op: "in"})
+func (db *Init) WhereInOr(field string, value interface{}) *Init {
+	db.where = append(db.where, whereDb{and: false, field: field, value: value, op: "in"})
 	return db
 }
 
-func (db *Init) WhereNotIn(field string, value []interface{}) *Init {
-	db.where = append(db.where, whereDb{and: true, field: field, valueIn: value, op: "notIn"})
+func (db *Init) WhereNotIn(field string, value interface{}) *Init {
+	db.where = append(db.where, whereDb{and: true, field: field, value: value, op: "notIn"})
 	return db
 }
 
-func (db *Init) WhereNotInOr(field string, value []interface{}) *Init {
-	db.where = append(db.where, whereDb{and: false, field: field, valueIn: value, op: "notIn"})
+func (db *Init) WhereNotInOr(field string, value interface{}) *Init {
+	db.where = append(db.where, whereDb{and: false, field: field, value: value, op: "notIn"})
 	return db
 }
 
@@ -104,11 +104,11 @@ func (db *Init) joinBuild() {
 func whereInValue(dt []interface{}) []string {
 	var valStr []string
 	for _, v := range dt {
-		data := valueInterface(v)
-		switch data[1] {
-		case "string":
-			valStr = append(valStr, "'"+data[0]+"'")
+		switch val := v.(type) {
+		case string:
+			valStr = append(valStr, "'"+val+"'")
 		default:
+			data := valueInterface(val)
 			valStr = append(valStr, data[0])
 		}
 	}
@@ -134,10 +134,10 @@ func (db *Init) whereBuild() {
 		case "between":
 			query += "between '" + v.starDate + "' and '" + v.endDate
 		case "in":
-			whereIn := whereInValue(v.valueIn)
+			whereIn := whereInValue(v.value)
 			query += v.field + " in(" + strings.Join(whereIn, ",") + ")"
 		case "notIn":
-			whereIn := whereInValue(v.valueIn)
+			whereIn := whereInValue(v.value)
 			query += v.field + " not in(" + strings.Join(whereIn, ",") + ")"
 		default:
 			fieldAr := strings.Split(strings.TrimSpace(v.field), " ")
