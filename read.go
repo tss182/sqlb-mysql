@@ -166,10 +166,10 @@ func (db *Init) whereBuild() {
 				}
 			}
 		}
+		groupOpen = false
 		//append to query
 		db.query = append(db.query, query)
 	}
-	groupOpen = false
 }
 
 func (db *Init) buildQuery() error {
