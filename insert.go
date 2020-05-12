@@ -3,6 +3,7 @@ package sqlb
 import (
 	. "database/sql"
 	"errors"
+	"reflect"
 	"strings"
 )
 
@@ -64,6 +65,20 @@ func (db *Init) Insert(query map[string]interface{}) (interface{}, error) {
 
 	return insert(querySql, value, db)
 
+}
+
+func (db *Init) InsertStruct(insert interface{}) (interface{}, error) {
+	t := reflect.TypeOf(insert)
+	v := reflect.ValueOf(insert)
+	insertMap := make(map[string]interface{})
+	for i := 0; i < v.NumField(); i++ {
+		tag := strings.TrimSpace(t.Field(i).Tag.Get("sqlb"))
+		if tag == "" {
+			continue
+		}
+		insertMap[tag] = v.Field(i).Interface()
+	}
+	return db.Insert(insertMap)
 }
 
 func (db *Init) InsertBatch(query []map[string]interface{}) (interface{}, error) {

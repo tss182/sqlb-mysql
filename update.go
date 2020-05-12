@@ -62,6 +62,20 @@ func (db *Init) Update(query map[string]interface{}) error {
 	return update(db, value)
 }
 
+func (db *Init) UpdateStruct(update interface{}) error {
+	t := reflect.TypeOf(update)
+	v := reflect.ValueOf(update)
+	updateMap := make(map[string]interface{})
+	for i := 0; i < v.NumField(); i++ {
+		tag := strings.TrimSpace(t.Field(i).Tag.Get("sqlb"))
+		if tag == "" {
+			continue
+		}
+		updateMap[tag] = v.Field(i).Interface()
+	}
+	return db.Update(updateMap)
+}
+
 func (db *Init) UpdateBatch(query []map[string]interface{}, id string) error {
 	db.query = []string{}
 	id = strings.TrimSpace(id)
