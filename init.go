@@ -73,10 +73,12 @@ func (db *Init) Close() {
 func (db *Init) Clear() {
 	tx := db.transaction
 	dbs := db.dbs
+	query := db.query
 	p := reflect.ValueOf(db).Elem()
 	p.Set(reflect.Zero(p.Type()))
 	db.transaction = tx
 	db.dbs = dbs
+	db.query = query
 }
 
 func (db *Init) QueryView() string {
