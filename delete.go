@@ -6,6 +6,8 @@ import (
 )
 
 func (db *Init) Delete() error {
+	db.query = []string{}
+	defer db.Clear()
 	var err error
 
 	if db.from == "" {

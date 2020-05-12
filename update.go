@@ -9,6 +9,7 @@ import (
 )
 
 func update(db *Init, value []interface{}) error {
+	defer db.Clear()
 	var err error
 	var stmt *Stmt
 	if db.dbs == nil {
@@ -32,6 +33,7 @@ func update(db *Init, value []interface{}) error {
 }
 
 func (db *Init) Update(query map[string]interface{}) error {
+	db.query = []string{}
 	if db.from == "" {
 		//table not init
 		return errors.New("table not found")
@@ -61,6 +63,7 @@ func (db *Init) Update(query map[string]interface{}) error {
 }
 
 func (db *Init) UpdateBatch(query []map[string]interface{}, id string) error {
+	db.query = []string{}
 	id = strings.TrimSpace(id)
 	if db.from == "" {
 		//table not init

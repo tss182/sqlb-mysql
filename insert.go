@@ -7,6 +7,7 @@ import (
 )
 
 func insert(querySql string, value []interface{}, db *Init) (interface{}, error) {
+	defer db.Clear()
 	var err error
 	var stmt *Stmt
 	if db.dbs == nil {
@@ -39,6 +40,7 @@ func insert(querySql string, value []interface{}, db *Init) (interface{}, error)
 	return id, nil
 }
 func (db *Init) Insert(query map[string]interface{}) (interface{}, error) {
+	db.query = []string{}
 	if db.from == "" {
 		//table not init
 		return nil, errors.New("table not found")
@@ -65,6 +67,7 @@ func (db *Init) Insert(query map[string]interface{}) (interface{}, error) {
 }
 
 func (db *Init) InsertBatch(query []map[string]interface{}) (interface{}, error) {
+	db.query = []string{}
 	if db.from == "" {
 		//table not init
 		return nil, errors.New("table not found")

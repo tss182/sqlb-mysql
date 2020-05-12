@@ -220,6 +220,7 @@ func (db *Init) buildQuery() error {
 }
 
 func (db *Init) Result() ([]map[string]interface{}, error) {
+	db.query = []string{}
 	defer db.Clear()
 	err := db.buildQuery()
 	if err != nil {
