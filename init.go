@@ -2,6 +2,7 @@ package sqlb
 
 import (
 	"database/sql"
+	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"os"
 	"reflect"
@@ -9,12 +10,12 @@ import (
 )
 
 type Init struct {
-	ConnectionType    string //config, env
-	connection struct{
-		host              string
-		user              string
-		password          string
-		dbName            string
+	ConnectionType string //config, env
+	connection     struct {
+		host     string
+		user     string
+		password string
+		dbName   string
 	}
 	sel               string
 	from              string
@@ -44,7 +45,7 @@ func (db *Init) RemoveSpecialChar() {
 	db.removeSpecialChar = true
 }
 
-func (db *Init) Setup(host,user,password,dbname string) {
+func (db *Init) Setup(host, user, password, dbname string) {
 	db.connection.host = host
 	db.connection.user = user
 	db.connection.password = password
@@ -66,7 +67,7 @@ func (db *Init) mysqlConnect() (*sql.DB, error) {
 		db.connection.password = os.Getenv("sqlPassword")
 		db.connection.dbName = os.Getenv("sqlDb")
 	}
-	dns := fmt.Sprintf("%s:%s@%s/%s",db.connection.user,db.connection.password,db.connection.host,db.connection.dbName)
+	dns := fmt.Sprintf("%s:%s@%s/%s", db.connection.user, db.connection.password, db.connection.host, db.connection.dbName)
 	dbs, err = sql.Open("mysql", dns)
 	if err != nil {
 		return nil, err
