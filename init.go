@@ -67,6 +67,7 @@ func (db *Init) mysqlConnect() (*sql.DB, error) {
 func (db *Init) Close() {
 	if db.dbs != nil {
 		_ = db.dbs.Close()
+		db.dbs = nil
 	}
 }
 
