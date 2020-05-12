@@ -85,11 +85,13 @@ func (db *Init) Clear() {
 	tx := db.transaction
 	dbs := db.dbs
 	query := db.query
+	connection := db.connection
 	p := reflect.ValueOf(db).Elem()
 	p.Set(reflect.Zero(p.Type()))
 	db.transaction = tx
 	db.dbs = dbs
 	db.query = query
+	db.connection = connection
 }
 
 func (db *Init) QueryView() string {
