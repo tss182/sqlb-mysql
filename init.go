@@ -10,10 +10,12 @@ import (
 
 type Init struct {
 	ConnectionType    string //config, env
-	Host              string
-	User              string
-	Password          string
-	DbName            string
+	connection struct{
+		host              string
+		user              string
+		password          string
+		dbName            string
+	}
 	sel               string
 	from              string
 	join              []string
@@ -42,6 +44,13 @@ func (db *Init) RemoveSpecialChar() {
 	db.removeSpecialChar = true
 }
 
+func (db *Init) Setup(host,user,password,dbname string) {
+	db.connection.host = host
+	db.connection.user = user
+	db.connection.password = password
+	db.connection.dbName = dbname
+}
+
 func (db *Init) From(from string) *Init {
 	db.from = from
 	db.call = false
@@ -52,12 +61,13 @@ func (db *Init) mysqlConnect() (*sql.DB, error) {
 	var dbs *sql.DB
 	var err error
 	if db.ConnectionType == "env" {
-		db.Host = os.Getenv("sqlHost")
-		db.User = os.Getenv("sqlUser")
-		db.Password = os.Getenv("sqlPassword")
-		db.DbName = os.Getenv("sqlDb")
+		db.connection.host = os.Getenv("sqlHost")
+		db.connection.user = os.Getenv("sqlUser")
+		db.connection.password = os.Getenv("sqlPassword")
+		db.connection.dbName = os.Getenv("sqlDb")
 	}
-	dbs, err = sql.Open("mysql", db.User+":"+db.Password+"@"+db.Host+"/"+db.DbName)
+	dns := fmt.Sprintf("%s:%s@%s/%s",db.connection.user,db.connection.password,db.connection.host,db.connection.dbName)
+	dbs, err = sql.Open("mysql", dns)
 	if err != nil {
 		return nil, err
 	}
