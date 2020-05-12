@@ -119,9 +119,10 @@ func (db *Init) whereBuild() {
 	if len(db.where) >= 1 {
 		db.query = append(db.query, "where")
 	}
+	groupOpen := false
 	for i, v := range db.where {
 		query := ""
-		if i != 0 && v.op != "endGroup" {
+		if i != 0 && v.op != "endGroup" && groupOpen == false {
 			query = "and "
 			if !v.and {
 				query = "or "
@@ -130,6 +131,7 @@ func (db *Init) whereBuild() {
 		switch v.op {
 		case "startGroup":
 			query += "("
+			groupOpen = true
 		case "endGroup":
 			query += ")"
 		case "between":
@@ -167,6 +169,7 @@ func (db *Init) whereBuild() {
 		//append to query
 		db.query = append(db.query, query)
 	}
+	groupOpen = false
 }
 
 func (db *Init) buildQuery() error {
