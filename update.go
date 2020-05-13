@@ -3,6 +3,7 @@ package sqlb
 import (
 	. "database/sql"
 	"errors"
+	jsoniter "github.com/json-iterator/go"
 	"reflect"
 	"strconv"
 	"strings"
@@ -62,15 +63,15 @@ func (db *Init) Update(query map[string]interface{}) error {
 }
 
 func (db *Init) UpdateStruct(update interface{}) error {
-	t := reflect.TypeOf(update)
-	v := reflect.ValueOf(update)
-	updateMap := make(map[string]interface{})
-	for i := 0; i < v.NumField(); i++ {
-		tag := strings.TrimSpace(t.Field(i).Tag.Get("sqlb"))
-		if tag == "" {
-			continue
-		}
-		updateMap[tag] = v.Field(i).Interface()
+	json := jsoniter.Config{EscapeHTML: true, TagKey: "sqlb", OnlyTaggedField: true}.Froze()
+	r, err := json.Marshal(update)
+	if err != nil {
+		return err
+	}
+	var updateMap map[string]interface{}
+	err = json.Unmarshal(r, updateMap)
+	if err != nil {
+		return err
 	}
 	return db.Update(updateMap)
 }
@@ -138,4 +139,18 @@ func (db *Init) UpdateBatch(query []map[string]interface{}, id string) error {
 	}
 	db.query = append(db.query, "where "+id+" in("+strings.Join(whereIn, ",")+")")
 	return update(db, values)
+}
+
+func (db *Init) UpdateBatchStruct(insert interface{}, id string) error {
+	json := jsoniter.Config{EscapeHTML: true, TagKey: "sqlb", OnlyTaggedField: true}.Froze()
+	r, err := json.Marshal(insert)
+	if err != nil {
+		return err
+	}
+	var updateMap []map[string]interface{}
+	err = json.Unmarshal(r, updateMap)
+	if err != nil {
+		return err
+	}
+	return db.UpdateBatch(updateMap, id)
 }

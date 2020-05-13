@@ -3,6 +3,7 @@ package sqlb
 import (
 	. "database/sql"
 	"errors"
+	jsoniter "github.com/json-iterator/go"
 	"html"
 	"strconv"
 	"strings"
@@ -105,11 +106,17 @@ func whereInValue(dt interface{}) []string {
 	var valStr []string
 	switch v := dt.(type) {
 	case []string:
-		for _,v2 := range v { valStr = append(valStr,"'"+v2+"'")}
+		for _, v2 := range v {
+			valStr = append(valStr, "'"+v2+"'")
+		}
 	case []int:
-		for _,v2 := range v { valStr = append(valStr,strconv.Itoa(v2))}
+		for _, v2 := range v {
+			valStr = append(valStr, strconv.Itoa(v2))
+		}
 	case []uint:
-		for _,v2 := range v { valStr = append(valStr,strconv.Itoa(int(v2)))}
+		for _, v2 := range v {
+			valStr = append(valStr, strconv.Itoa(int(v2)))
+		}
 	default:
 		panic("error, type data where in not support")
 	}
@@ -301,6 +308,40 @@ func (db *Init) Row() (map[string]interface{}, error) {
 		return nil, nil
 	}
 	return result[0], nil
+}
+
+func (db *Init) ResultStruct(result interface{}) error {
+	r, err := db.Result()
+	if err != nil {
+		return err
+	}
+	json := jsoniter.Config{EscapeHTML: true, TagKey: "sqlb", OnlyTaggedField: true}.Froze()
+	rb, err := json.Marshal(r)
+	if err != nil {
+		return err
+	}
+	err = json.Unmarshal(rb, &result)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (db *Init) RowStruct(result interface{}) error {
+	r, err := db.Row()
+	if err != nil {
+		return err
+	}
+	json := jsoniter.Config{EscapeHTML: true, TagKey: "sqlb", OnlyTaggedField: true}.Froze()
+	rb, err := json.Marshal(r)
+	if err != nil {
+		return err
+	}
+	err = json.Unmarshal(rb, &result)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (db *Init) Call(procedure string, value []interface{}) *Init {

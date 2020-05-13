@@ -3,7 +3,7 @@ package sqlb
 import (
 	. "database/sql"
 	"errors"
-	"reflect"
+	jsoniter "github.com/json-iterator/go"
 	"strings"
 )
 
@@ -68,15 +68,15 @@ func (db *Init) Insert(query map[string]interface{}) (interface{}, error) {
 }
 
 func (db *Init) InsertStruct(insert interface{}) (interface{}, error) {
-	t := reflect.TypeOf(insert)
-	v := reflect.ValueOf(insert)
-	insertMap := make(map[string]interface{})
-	for i := 0; i < v.NumField(); i++ {
-		tag := strings.TrimSpace(t.Field(i).Tag.Get("sqlb"))
-		if tag == "" {
-			continue
-		}
-		insertMap[tag] = v.Field(i).Interface()
+	json := jsoniter.Config{EscapeHTML: true, TagKey: "sqlb", OnlyTaggedField: true}.Froze()
+	r, err := json.Marshal(insert)
+	if err != nil {
+		return nil, err
+	}
+	var insertMap map[string]interface{}
+	err = json.Unmarshal(r, insertMap)
+	if err != nil {
+		return nil, err
 	}
 	return db.Insert(insertMap)
 }
@@ -108,4 +108,18 @@ func (db *Init) InsertBatch(query []map[string]interface{}) (interface{}, error)
 	querySql += "(" + field + ") values " + tags
 
 	return insert(querySql, value, db)
+}
+
+func (db *Init) InsertBatchStruct(insert interface{}) (interface{}, error) {
+	json := jsoniter.Config{EscapeHTML: true, TagKey: "sqlb", OnlyTaggedField: true}.Froze()
+	r, err := json.Marshal(insert)
+	if err != nil {
+		return nil, err
+	}
+	var insertMap []map[string]interface{}
+	err = json.Unmarshal(r, insertMap)
+	if err != nil {
+		return nil, err
+	}
+	return db.InsertBatch(insertMap)
 }
