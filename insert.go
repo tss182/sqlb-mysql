@@ -74,7 +74,7 @@ func (db *Init) InsertStruct(insert interface{}) (interface{}, error) {
 		return nil, err
 	}
 	var insertMap map[string]interface{}
-	err = json.Unmarshal(r, insertMap)
+	err = json.Unmarshal(r, &insertMap)
 	if err != nil {
 		return nil, err
 	}
@@ -117,7 +117,7 @@ func (db *Init) InsertBatchStruct(insert interface{}) (interface{}, error) {
 		return nil, err
 	}
 	var insertMap []map[string]interface{}
-	err = json.Unmarshal(r, insertMap)
+	err = json.Unmarshal(r, &insertMap)
 	if err != nil {
 		return nil, err
 	}

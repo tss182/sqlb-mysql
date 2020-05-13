@@ -69,7 +69,7 @@ func (db *Init) UpdateStruct(update interface{}) error {
 		return err
 	}
 	var updateMap map[string]interface{}
-	err = json.Unmarshal(r, updateMap)
+	err = json.Unmarshal(r, &updateMap)
 	if err != nil {
 		return err
 	}
@@ -148,7 +148,7 @@ func (db *Init) UpdateBatchStruct(insert interface{}, id string) error {
 		return err
 	}
 	var updateMap []map[string]interface{}
-	err = json.Unmarshal(r, updateMap)
+	err = json.Unmarshal(r, &updateMap)
 	if err != nil {
 		return err
 	}
