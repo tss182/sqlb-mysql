@@ -54,7 +54,6 @@ func (db *Init) Update(query map[string]interface{}) error {
 		value = append(value, v)
 	}
 
-	db.query = append(db.query, "update "+db.from)      //update
 	db.joinBuild()                                      //join
 	db.query = append(db.query, strings.Join(set, ",")) //update
 	db.whereBuild()                                     //where
