@@ -142,7 +142,7 @@ func (db *Init) whereBuild() {
 		case "endGroup":
 			query += ")"
 		case "between":
-			query += v.field + " between '" + v.starDate + "' and '" + v.endDate
+			query += v.field + " between '" + v.starDate + "' and '" + v.endDate + "'"
 		case "in":
 			whereIn := whereInValue(v.value)
 			query += v.field + " in(" + strings.Join(whereIn, ",") + ")"
