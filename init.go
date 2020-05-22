@@ -108,15 +108,15 @@ func (db *Init) QueryBackup() Init {
 	return backup
 }
 
-func (db *Init) QueryRestore(backup *Init) {
-	backup.sel = db.sel
-	backup.from = db.from
-	backup.join = db.join
-	backup.orderBy = db.orderBy
-	backup.groupBy = db.groupBy
-	backup.limit = db.limit
-	backup.having = db.having
-	backup.where = db.where
+func (db *Init) QueryRestore(restore Init) {
+	db.sel = restore.sel
+	db.from = restore.from
+	db.join = restore.join
+	db.orderBy = restore.orderBy
+	db.groupBy = restore.groupBy
+	db.limit = restore.limit
+	db.having = restore.having
+	db.where = restore.where
 }
 
 func (db *Init) QueryView() string {
