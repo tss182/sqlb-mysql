@@ -95,6 +95,30 @@ func (db *Init) Clear() {
 	db.connection = connection
 }
 
+func (db *Init) QueryBackup() Init {
+	var backup Init
+	backup.sel = db.sel
+	backup.from = db.from
+	backup.join = db.join
+	backup.orderBy = db.orderBy
+	backup.groupBy = db.groupBy
+	backup.limit = db.limit
+	backup.having = db.having
+	backup.where = db.where
+	return backup
+}
+
+func (db *Init) QueryRestore(backup *Init) {
+	backup.sel = db.sel
+	backup.from = db.from
+	backup.join = db.join
+	backup.orderBy = db.orderBy
+	backup.groupBy = db.groupBy
+	backup.limit = db.limit
+	backup.having = db.having
+	backup.where = db.where
+}
+
 func (db *Init) QueryView() string {
 	return strings.Join(db.query, "\n")
 }
