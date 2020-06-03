@@ -227,11 +227,14 @@ func (db *Init) buildQuery() error {
 }
 
 func (db *Init) Result() ([]map[string]interface{}, error) {
-	db.query = []string{}
+	var err error
 	defer db.Clear()
-	err := db.buildQuery()
-	if err != nil {
-		return nil, err
+	if db.call == false {
+		db.query = []string{}
+		err = db.buildQuery()
+		if err != nil {
+			return nil, err
+		}
 	}
 	sqlQuery := strings.Join(db.query, "\n")
 	if db.dbs == nil {
@@ -240,6 +243,9 @@ func (db *Init) Result() ([]map[string]interface{}, error) {
 			return nil, err
 		}
 	}
+
+	//set call to false
+	db.call = false
 
 	var stmt *Stmt
 	if db.transaction != nil {
