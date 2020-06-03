@@ -244,19 +244,34 @@ func (db *Init) Result() ([]map[string]interface{}, error) {
 		}
 	}
 
+	var rows *Rows
+	var stmt *Stmt
+
+	if db.call == false {
+		if db.transaction != nil {
+			stmt, err = db.transaction.Prepare(sqlQuery)
+		} else {
+			stmt, err = db.dbs.Prepare(sqlQuery)
+		}
+		if err != nil {
+			return nil, err
+		}
+		rows, err = stmt.Query()
+
+	} else {
+		if db.transaction != nil {
+			rows, err = db.transaction.Query(sqlQuery)
+		} else {
+			rows, err = db.dbs.Query(sqlQuery)
+		}
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	//set call to false
 	db.call = false
 
-	var stmt *Stmt
-	if db.transaction != nil {
-		stmt, err = db.transaction.Prepare(sqlQuery)
-	} else {
-		stmt, err = db.dbs.Prepare(sqlQuery)
-	}
-	if err != nil {
-		return nil, err
-	}
-	rows, err := stmt.Query()
 	var columns, _ = rows.Columns()
 	count := len(columns)
 	values := make([]interface{}, count)
@@ -293,7 +308,14 @@ func (db *Init) Result() ([]map[string]interface{}, error) {
 		}
 		result = append(result, data)
 	}
-	err = stmt.Close()
+	if stmt != nil {
+		err = stmt.Close()
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	err = rows.Close()
 	if err != nil {
 		return nil, err
 	}
