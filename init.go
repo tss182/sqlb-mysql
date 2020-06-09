@@ -36,6 +36,7 @@ type whereDb struct {
 	and      bool
 	field    string
 	value    interface{}
+	sqlRaw   string
 	starDate string
 	endDate  string
 	op       string //'',in,notIn,startGroup,endGroup,between

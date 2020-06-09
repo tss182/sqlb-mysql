@@ -61,6 +61,16 @@ func (db *Init) WhereBetweenOr(field, startDate, endDate string) *Init {
 	return db
 }
 
+func (db *Init) WhereRaw(sql string) *Init {
+	db.where = append(db.where, whereDb{and: true, sqlRaw: sql, op: "raw"})
+	return db
+}
+
+func (db *Init) WhereRawOr(sql string) *Init {
+	db.where = append(db.where, whereDb{and: false, sqlRaw: sql, op: "raw"})
+	return db
+}
+
 func (db *Init) StartGroup() *Init {
 	db.where = append(db.where, whereDb{and: true, op: "startGroup"})
 	return db
@@ -143,6 +153,8 @@ func (db *Init) whereBuild() {
 			query += ")"
 		case "between":
 			query += v.field + " between '" + v.starDate + "' and '" + v.endDate + "'"
+		case "raw":
+			query += v.sqlRaw
 		case "in":
 			whereIn := whereInValue(v.value)
 			query += v.field + " in(" + strings.Join(whereIn, ",") + ")"
