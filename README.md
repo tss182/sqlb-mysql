@@ -9,7 +9,7 @@ go get github.com/tss182/sqlb-mysql`
  		Host: "cp(127.0.0.1:3306)",
  		User: "root",
  		Password: "",
- 		DbName: "bandros_v4",
+ 		DbName: "test",
  	}
  	defer db.Close()`
 
