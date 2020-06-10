@@ -7,7 +7,7 @@ go get github.com/tss182/sqlb-mysql`
 ### connection
  	db := sqlb.Init{}
     db.Setup("tcp(127.0.0.1:3306)","userSql","PasswordSql","dbName")
- 	defer db.Close()`
+ 	defer db.Close()
 
 db.close is close database connection
 
