@@ -226,8 +226,8 @@ func (db *Init) buildQuery() error {
 	}
 
 	//add order by
-	for _, v := range db.orderBy {
-		db.query = append(db.query, "order by "+v)
+	if len(db.orderBy) > 0 {
+		db.query = append(db.query, "order by ", strings.Join(db.orderBy, ","))
 	}
 
 	//add limit
