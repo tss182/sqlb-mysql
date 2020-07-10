@@ -129,13 +129,20 @@ func (db *Init) UpdateBatch(query []map[string]interface{}, id string) error {
 
 	db.query = append(db.query, "update "+db.from) //update
 	db.joinBuild()                                 //join
-
+	db.query = append(db.query, " SET ")
+	var setQuery []string
 	for i, v := range set {
-		db.query = append(db.query, strings.Join(v, "")+" END),")
+		setQuery = append(setQuery, strings.Join(v, "")+" END)")
 		for _, v2 := range value[i] {
 			values = append(values, v2)
 		}
+	}
 
+	for i, v := range setQuery {
+		if len(setQuery)-1 != i {
+			v += ","
+		}
+		db.query = append(db.query, v)
 	}
 	db.query = append(db.query, "where "+id+" in("+strings.Join(whereIn, ",")+")")
 	return update(db, values)

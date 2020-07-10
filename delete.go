@@ -22,6 +22,7 @@ func (db *Init) Delete() error {
 	}
 
 	db.query = append(db.query, "DELETE FROM "+db.from)
+	db.joinBuild()
 	db.whereBuild()
 	if db.transaction != nil {
 		_, err = db.transaction.Exec(strings.Join(db.query, " "))
