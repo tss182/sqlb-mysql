@@ -77,7 +77,7 @@ func (db *Init) mysqlConnect() (*sql.DB, error) {
 }
 
 func (db *Init) Close() {
-	if db.dbs != nil {
+	if db.dbs != nil && db.transaction != nil {
 		_ = db.dbs.Close()
 		db.dbs = nil
 	}
