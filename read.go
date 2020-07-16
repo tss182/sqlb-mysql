@@ -259,7 +259,7 @@ func (db *Init) Result() ([]map[string]interface{}, error) {
 	var rows *Rows
 	var stmt *Stmt
 
-	if db.call == false {
+	if db.queryBuilder.call == false {
 		if db.transaction != nil {
 			stmt, err = db.transaction.Prepare(sqlQuery)
 		} else {
@@ -282,7 +282,7 @@ func (db *Init) Result() ([]map[string]interface{}, error) {
 	}
 
 	//set call to false
-	db.call = false
+	db.queryBuilder.call = false
 
 	var columns, _ = rows.Columns()
 	count := len(columns)
