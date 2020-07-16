@@ -9,105 +9,105 @@ import (
 	"strings"
 )
 
-func (db *Init) Select(sel string) *Init {
+func (db *QueryInit) Select(sel string) *QueryInit {
 	db.sel = sel
 	return db
 }
 
-func (db *Init) Join(table, on, join string) *Init {
+func (db *QueryInit) Join(table, on, join string) *QueryInit {
 	join = strings.ToLower(join)
 	joinStr := join + " join " + table + " on " + on
 	db.join = append(db.join, joinStr)
 	return db
 }
 
-func (db *Init) Where(field string, value interface{}) *Init {
+func (db *QueryInit) Where(field string, value interface{}) *QueryInit {
 	db.where = append(db.where, whereDb{and: true, field: field, value: value})
 	return db
 }
 
-func (db *Init) WhereOr(field string, value interface{}) *Init {
+func (db *QueryInit) WhereOr(field string, value interface{}) *QueryInit {
 	db.where = append(db.where, whereDb{and: false, field: field, value: value})
 	return db
 }
 
-func (db *Init) WhereIn(field string, value interface{}) *Init {
+func (db *QueryInit) WhereIn(field string, value interface{}) *QueryInit {
 	db.where = append(db.where, whereDb{and: true, field: field, value: value, op: "in"})
 	return db
 }
 
-func (db *Init) WhereInOr(field string, value interface{}) *Init {
+func (db *QueryInit) WhereInOr(field string, value interface{}) *QueryInit {
 	db.where = append(db.where, whereDb{and: false, field: field, value: value, op: "in"})
 	return db
 }
 
-func (db *Init) WhereNotIn(field string, value interface{}) *Init {
+func (db *QueryInit) WhereNotIn(field string, value interface{}) *QueryInit {
 	db.where = append(db.where, whereDb{and: true, field: field, value: value, op: "notIn"})
 	return db
 }
 
-func (db *Init) WhereNotInOr(field string, value interface{}) *Init {
+func (db *QueryInit) WhereNotInOr(field string, value interface{}) *QueryInit {
 	db.where = append(db.where, whereDb{and: false, field: field, value: value, op: "notIn"})
 	return db
 }
 
-func (db *Init) WhereBetween(field, startDate, endDate string) *Init {
+func (db *QueryInit) WhereBetween(field, startDate, endDate string) *QueryInit {
 	db.where = append(db.where, whereDb{and: true, field: field, starDate: startDate, endDate: endDate, op: "between"})
 	return db
 }
 
-func (db *Init) WhereBetweenOr(field, startDate, endDate string) *Init {
+func (db *QueryInit) WhereBetweenOr(field, startDate, endDate string) *QueryInit {
 	db.where = append(db.where, whereDb{and: false, field: field, starDate: startDate, endDate: endDate, op: "between"})
 	return db
 }
 
-func (db *Init) WhereRaw(sql string) *Init {
+func (db *QueryInit) WhereRaw(sql string) *QueryInit {
 	db.where = append(db.where, whereDb{and: true, sqlRaw: sql, op: "raw"})
 	return db
 }
 
-func (db *Init) WhereRawOr(sql string) *Init {
+func (db *QueryInit) WhereRawOr(sql string) *QueryInit {
 	db.where = append(db.where, whereDb{and: false, sqlRaw: sql, op: "raw"})
 	return db
 }
 
-func (db *Init) StartGroup() *Init {
+func (db *QueryInit) StartGroup() *QueryInit {
 	db.where = append(db.where, whereDb{and: true, op: "startGroup"})
 	return db
 }
 
-func (db *Init) StartGroupOr() *Init {
+func (db *QueryInit) StartGroupOr() *QueryInit {
 	db.where = append(db.where, whereDb{and: false, op: "startGroup"})
 	return db
 }
 
-func (db *Init) EndGroup() *Init {
+func (db *QueryInit) EndGroup() *QueryInit {
 	db.where = append(db.where, whereDb{op: "endGroup"})
 	return db
 }
 
-func (db *Init) OrderBy(orderBy string, dir string) *Init {
+func (db *QueryInit) OrderBy(orderBy string, dir string) *QueryInit {
 	db.orderBy = append(db.orderBy, orderBy+" "+dir)
 	return db
 }
 
-func (db *Init) GroupBy(groupBy string) *Init {
+func (db *QueryInit) GroupBy(groupBy string) *QueryInit {
 	db.groupBy = groupBy
 	return db
 }
 
-func (db *Init) Limit(limit int, start int) *Init {
+func (db *QueryInit) Limit(limit int, start int) *QueryInit {
 	db.limit = "limit " + strconv.Itoa(start) + "," + strconv.Itoa(limit)
 	return db
 }
 
-func (db *Init) Having(str string) *Init {
+func (db *QueryInit) Having(str string) *QueryInit {
 	db.having = str
 	return db
 }
 
 func (db *Init) joinBuild() {
-	for _, v := range db.join {
+	for _, v := range db.queryBuilder.join {
 		db.query = append(db.query, strings.TrimSpace(v))
 	}
 }
@@ -133,11 +133,11 @@ func whereInValue(dt interface{}) []string {
 	return valStr
 }
 func (db *Init) whereBuild() {
-	if len(db.where) >= 1 {
+	if len(db.queryBuilder.where) >= 1 {
 		db.query = append(db.query, "where")
 	}
 	var opBefore string
-	for i, v := range db.where {
+	for i, v := range db.queryBuilder.where {
 		query := ""
 		if i != 0 && v.op != "endGroup" && opBefore != "startGroup" {
 			query = "and "
@@ -193,21 +193,21 @@ func (db *Init) whereBuild() {
 func (db *Init) buildQuery() error {
 
 	//add select
-	db.sel = strings.TrimSpace(db.sel)
-	db.sel = strings.TrimRight(db.sel, ",")
-	if db.sel == "" {
+	db.queryBuilder.sel = strings.TrimSpace(db.queryBuilder.sel)
+	db.queryBuilder.sel = strings.TrimRight(db.queryBuilder.sel, ",")
+	if db.queryBuilder.sel == "" {
 		//select not init
-		db.sel = "*"
+		db.queryBuilder.sel = "*"
 	}
 
-	db.query = append(db.query, "select "+db.sel)
+	db.query = append(db.query, "select "+db.queryBuilder.sel)
 
 	//add from
-	if db.from == "" && db.call == false {
+	if db.queryBuilder.from == "" && db.queryBuilder.call == false {
 		//table not init
 		return errors.New("table not found")
 	}
-	db.query = append(db.query, "from "+db.from)
+	db.query = append(db.query, "from "+db.queryBuilder.from)
 
 	//add join
 	db.joinBuild()
@@ -216,23 +216,23 @@ func (db *Init) buildQuery() error {
 	db.whereBuild()
 
 	//add groupBy
-	if db.groupBy != "" {
-		db.query = append(db.query, "group by "+db.groupBy)
+	if db.queryBuilder.groupBy != "" {
+		db.query = append(db.query, "group by "+db.queryBuilder.groupBy)
 	}
 
 	//add having
-	if db.having != "" {
-		db.query = append(db.query, "having "+db.having)
+	if db.queryBuilder.having != "" {
+		db.query = append(db.query, "having "+db.queryBuilder.having)
 	}
 
 	//add order by
-	if len(db.orderBy) > 0 {
-		db.query = append(db.query, "order by ", strings.Join(db.orderBy, ","))
+	if len(db.queryBuilder.orderBy) > 0 {
+		db.query = append(db.query, "order by ", strings.Join(db.queryBuilder.orderBy, ","))
 	}
 
 	//add limit
-	if db.limit != "" {
-		db.query = append(db.query, db.limit)
+	if db.queryBuilder.limit != "" {
+		db.query = append(db.query, db.queryBuilder.limit)
 	}
 
 	return nil
@@ -241,7 +241,7 @@ func (db *Init) buildQuery() error {
 func (db *Init) Result() ([]map[string]interface{}, error) {
 	var err error
 	defer db.Clear()
-	if db.call == false {
+	if db.queryBuilder.call == false {
 		db.query = []string{}
 		err = db.buildQuery()
 		if err != nil {
@@ -336,8 +336,8 @@ func (db *Init) Result() ([]map[string]interface{}, error) {
 }
 
 func (db *Init) Row() (map[string]interface{}, error) {
-	if db.call == false {
-		db.Limit(1, 0)
+	if db.queryBuilder.call == false {
+		db.queryBuilder.Limit(1, 0)
 	}
 	result, err := db.Result()
 	if err != nil {
@@ -390,7 +390,7 @@ func (db *Init) Call(procedure string, value []interface{}) *Init {
 		var valAr []string
 		for _, v := range value {
 			var str string
-			if db.removeSpecialChar {
+			if db.queryBuilder.removeSpecialChar {
 				str = removeSpecialChar(v)
 			} else {
 				str = valueInterface(v)[0]
@@ -400,6 +400,6 @@ func (db *Init) Call(procedure string, value []interface{}) *Init {
 		values = "('" + strings.Join(valAr, "','") + "')"
 	}
 	db.query = []string{"call " + procedure + " " + values}
-	db.call = true
+	db.queryBuilder.call = true
 	return db
 }

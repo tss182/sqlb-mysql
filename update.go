@@ -35,7 +35,7 @@ func update(db *Init, value []interface{}) error {
 
 func (db *Init) Update(query map[string]interface{}) error {
 	db.query = []string{}
-	if db.from == "" {
+	if db.queryBuilder.from == "" {
 		//table not init
 		return errors.New("table not found")
 	}
@@ -43,13 +43,13 @@ func (db *Init) Update(query map[string]interface{}) error {
 		return errors.New("query invalid")
 	}
 
-	db.query = append(db.query, "update "+db.from+" set ")
+	db.query = append(db.query, "update "+db.queryBuilder.from+" set ")
 
 	var set []string
 	var value []interface{}
 	for i, v := range query {
 		set = append(set, i+"=?")
-		if db.removeSpecialChar {
+		if db.queryBuilder.removeSpecialChar {
 			v = removeSpecialChar(v)
 		}
 		value = append(value, v)
@@ -79,7 +79,7 @@ func (db *Init) UpdateStruct(update interface{}) error {
 func (db *Init) UpdateBatch(query []map[string]interface{}, id string) error {
 	db.query = []string{}
 	id = strings.TrimSpace(id)
-	if db.from == "" {
+	if db.queryBuilder.from == "" {
 		//table not init
 		return errors.New("table not found")
 	}
@@ -120,15 +120,15 @@ func (db *Init) UpdateBatch(query []map[string]interface{}, id string) error {
 				set[i2] = append(set[i2], i2+" = (CASE "+id+"\n")
 			}
 			set[i2] = append(set[i2], "WHEN '"+valId+"' THEN ?\n")
-			if db.removeSpecialChar {
+			if db.queryBuilder.removeSpecialChar {
 				v2 = removeSpecialChar(v2)
 			}
 			value[i2] = append(value[i2], v2)
 		}
 	}
 
-	db.query = append(db.query, "update "+db.from) //update
-	db.joinBuild()                                 //join
+	db.query = append(db.query, "update "+db.queryBuilder.from) //update
+	db.joinBuild()                                              //join
 	db.query = append(db.query, " SET ")
 	var setQuery []string
 	for i, v := range set {

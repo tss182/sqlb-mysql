@@ -42,18 +42,18 @@ func insert(querySql string, value []interface{}, db *Init) (interface{}, error)
 }
 func (db *Init) Insert(query map[string]interface{}) (interface{}, error) {
 	db.query = []string{}
-	if db.from == "" {
+	if db.queryBuilder.from == "" {
 		//table not init
 		return nil, errors.New("table not found")
 	}
-	querySql := "INSERT INTO " + db.from
+	querySql := "INSERT INTO " + db.queryBuilder.from
 	tag := ""
 	field := ""
 	value := []interface{}{}
 	for i, v := range query {
 		tag += "?,"
 		field += i + ","
-		if db.removeSpecialChar {
+		if db.queryBuilder.removeSpecialChar {
 			v = removeSpecialChar(v)
 		}
 		value = append(value, v)
@@ -83,11 +83,11 @@ func (db *Init) InsertStruct(insert interface{}) (interface{}, error) {
 
 func (db *Init) InsertBatch(query []map[string]interface{}) (interface{}, error) {
 	db.query = []string{}
-	if db.from == "" {
+	if db.queryBuilder.from == "" {
 		//table not init
 		return nil, errors.New("table not found")
 	}
-	querySql := "INSERT INTO " + db.from
+	querySql := "INSERT INTO " + db.queryBuilder.from
 	var value []interface{}
 	field := joinMapKey(query[0], ",")
 	fieldArray := strings.Split(field, ",")
@@ -98,7 +98,7 @@ func (db *Init) InsertBatch(query []map[string]interface{}) (interface{}, error)
 	tags = tags[0 : len(tags)-1]
 	for _, v := range query {
 		for _, v2 := range fieldArray {
-			if db.removeSpecialChar {
+			if db.queryBuilder.removeSpecialChar {
 				v[v2] = removeSpecialChar(v[v2])
 			}
 			value = append(value, v[v2])

@@ -10,7 +10,7 @@ func (db *Init) Delete() error {
 	defer db.Clear()
 	var err error
 
-	if db.from == "" {
+	if db.queryBuilder.from == "" {
 		//table not init
 		return errors.New("table not found")
 	}
@@ -21,7 +21,7 @@ func (db *Init) Delete() error {
 		}
 	}
 
-	db.query = append(db.query, "DELETE FROM "+db.from)
+	db.query = append(db.query, "DELETE FROM "+db.queryBuilder.from)
 	db.joinBuild()
 	db.whereBuild()
 	if db.transaction != nil {
