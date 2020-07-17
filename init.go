@@ -100,8 +100,9 @@ func (db *Init) Clear() {
 	db.connection = connection
 }
 
-func (db *Init) Query(query QueryInit) {
+func (db *Init) Query(query QueryInit) *Init {
 	db.queryBuilder = query
+	return db
 }
 
 //func (db *QueryInit) QueryBackup() QueryInit {
