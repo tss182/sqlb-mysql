@@ -100,6 +100,11 @@ func (db *Init) Clear() {
 	db.connection = connection
 }
 
+func (db *QueryInit) Clear() {
+	p := reflect.ValueOf(db).Elem()
+	p.Set(reflect.Zero(p.Type()))
+}
+
 func (db *Init) Query(query QueryInit) *Init {
 	db.queryBuilder = query
 	return db
