@@ -7,6 +7,7 @@ import (
 	"os"
 	"reflect"
 	"strings"
+	"time"
 )
 
 type Init struct {
@@ -108,6 +109,17 @@ func (db *QueryInit) Clear() {
 func (db *Init) Query(query QueryInit) *Init {
 	db.queryBuilder = query
 	return db
+}
+func (db *Init) SetMaxIdleConns(n int) {
+	db.dbs.SetMaxIdleConns(n)
+}
+
+func (db *Init) SetMaxOpenConns(n int) {
+	db.dbs.SetMaxOpenConns(n)
+}
+
+func (db *Init) SetConnMaxLifetime(d time.Duration) {
+	db.dbs.SetConnMaxLifetime(d)
 }
 
 //func (db *QueryInit) QueryBackup() QueryInit {
