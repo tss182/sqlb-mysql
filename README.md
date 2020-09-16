@@ -29,4 +29,5 @@ sampel select
     db.row output map[string]inteface{} with limt 1
     
     
-## **Insert, Delete and update coming soon**
+## **Insert, Delete and update**
+https://github.com/tss182/sqlb-mysql/tree/master/sample
