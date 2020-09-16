@@ -125,7 +125,7 @@ func (db *Init) InsertBatchStruct(insert interface{}) (interface{}, error) {
 	return db.InsertBatch(insertMap)
 }
 
-func (db *QueryInit) Insert(query map[string]interface{}) (queryRaw string, err error) {
+func (db *QueryInit) Insert(query map[string]interface{}) (queryRaw string, values []interface{}, err error) {
 	if db.from == "" {
 		err = errors.New("table not found")
 		return
@@ -133,14 +133,13 @@ func (db *QueryInit) Insert(query map[string]interface{}) (queryRaw string, err 
 	queryRaw = "INSERT INTO " + db.from
 	tag := ""
 	field := ""
-	var value []interface{}
 	for i, v := range query {
 		tag += "?,"
 		field += i + ","
 		if db.removeSpecialChar {
 			v = removeSpecialChar(v)
 		}
-		value = append(value, v)
+		values = append(values, v)
 
 	}
 	tag = tag[0 : len(tag)-1]
@@ -149,14 +148,13 @@ func (db *QueryInit) Insert(query map[string]interface{}) (queryRaw string, err 
 	return
 }
 
-func (db *QueryInit) InsertBatch(query []map[string]interface{}) (queryRaw string, err error) {
+func (db *QueryInit) InsertBatch(query []map[string]interface{}) (queryRaw string, values []interface{}, err error) {
 	if db.from == "" {
 		//table not init
 		err = errors.New("table not found")
 		return
 	}
 	queryRaw = "INSERT INTO " + db.from
-	var value []interface{}
 	field := joinMapKey(query[0], ",")
 	fieldArray := strings.Split(field, ",")
 	tag := strings.Repeat("?,", len(fieldArray))
@@ -169,7 +167,7 @@ func (db *QueryInit) InsertBatch(query []map[string]interface{}) (queryRaw strin
 			if db.removeSpecialChar {
 				v[v2] = removeSpecialChar(v[v2])
 			}
-			value = append(value, v[v2])
+			values = append(values, v[v2])
 		}
 	}
 
