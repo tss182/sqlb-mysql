@@ -35,3 +35,20 @@ func (db *Init) Delete() error {
 	}
 	return nil
 }
+
+func (db *QueryInit) Delete() (queryRaw string, err error) {
+	var dbs Init
+	dbs.queryBuilder = *db
+	dbs.query = []string{}
+	if db.from == "" {
+		//table not init
+		err = errors.New("table not found")
+		return
+	}
+
+	dbs.query = append(dbs.query, "DELETE FROM "+db.from)
+	dbs.joinBuild()
+	dbs.whereBuild()
+	queryRaw = strings.Join(dbs.query, "\n")
+	return
+}

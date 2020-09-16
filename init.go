@@ -122,30 +122,6 @@ func (db *Init) SetConnMaxLifetime(d time.Duration) {
 	db.dbs.SetConnMaxLifetime(d)
 }
 
-//func (db *QueryInit) QueryBackup() QueryInit {
-//	var backup QueryInit
-//	backup.sel = db.sel
-//	backup.from = db.from
-//	backup.join = db.join
-//	backup.orderBy = db.orderBy
-//	backup.groupBy = db.groupBy
-//	backup.limit = db.limit
-//	backup.having = db.having
-//	backup.where = db.where
-//	return backup
-//}
-//
-//func (db *QueryInit) QueryRestore(restore QueryInit) {
-//	db.sel = restore.sel
-//	db.from = restore.from
-//	db.join = restore.join
-//	db.orderBy = restore.orderBy
-//	db.groupBy = restore.groupBy
-//	db.limit = restore.limit
-//	db.having = restore.having
-//	db.where = restore.where
-//}
-
 func (db *Init) QueryView() string {
 	return strings.Join(db.query, "\n")
 }

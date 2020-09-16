@@ -238,6 +238,24 @@ func (db *Init) buildQuery() error {
 	return nil
 }
 
+func (db *QueryInit) Result() (queryRaw string, err error) {
+	var dbs Init
+	dbs.queryBuilder = *db
+	dbs.query = []string{}
+	err = dbs.buildQuery()
+	if err != nil {
+		return
+	}
+	queryRaw = strings.Join(dbs.query, "\n")
+	return
+}
+
+func (db *QueryInit) Row() (queryRaw string, err error) {
+	db.Limit(1, 0)
+	queryRaw, err = db.Result()
+	return
+}
+
 func (db *Init) Result() ([]map[string]interface{}, error) {
 	var err error
 	defer db.Clear()
