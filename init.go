@@ -111,14 +111,23 @@ func (db *Init) Query(query QueryInit) *Init {
 	return db
 }
 func (db *Init) SetMaxIdleConns(n int) {
+	if db.dbs == nil {
+		db.dbs, _ = db.mysqlConnect()
+	}
 	db.dbs.SetMaxIdleConns(n)
 }
 
 func (db *Init) SetMaxOpenConns(n int) {
+	if db.dbs == nil {
+		db.dbs, _ = db.mysqlConnect()
+	}
 	db.dbs.SetMaxOpenConns(n)
 }
 
 func (db *Init) SetConnMaxLifetime(d time.Duration) {
+	if db.dbs == nil {
+		db.dbs, _ = db.mysqlConnect()
+	}
 	db.dbs.SetConnMaxLifetime(d)
 }
 
